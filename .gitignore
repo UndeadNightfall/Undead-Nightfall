@@ -1,0 +1,16 @@
+# Build/optimization tooling (not part of the shipped app)
+tools/
+node_modules/
+
+# Original-quality asset masters kept locally for re-encoding (not shipped)
+assets-src/
+
+# Backups and scratch artifacts from the optimization work
+index.BACKUP-before-asset-extraction.html
+index.optimized.html
+audio-ab.html
+undead_nightfall_lock_screen_audio_fixed_pwa.zip
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
