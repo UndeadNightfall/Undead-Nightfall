@@ -1,0 +1,47 @@
+01 | <none> | "use strict";
+02 | <none> | function stopTitleEvent(e){
+03 | <none> | if ("serviceWorker" in navigator) {
+04 | <none> | (function(){
+05 | <none> | window.addEventListener("load", function(){
+06 | <none> | window.SUPABASE_URL = "https://rslhteikozqqwdigqffv.supabase.co";
+07 | <none> | (function(){
+08 | <none> | function openUsernamePanel(event) {
+09 | <none> | (function(){
+10 | <none> | (function(){
+11 | <none> | (function(){
+12 | leaderboard-inline-image | (function(){
+13 | controls-inline-image-button | (function(){
+14 | username-inline-image-refreshed | (function(){
+15 | extras-menu-script | (function(){
+16 | begin-hunt-image-button | (function(){
+17 | extras-submenu-toggle-script | (function(){
+18 | instructions-pressed-visual-fix | (function(){
+19 | ui-click-sound-script | (function(){
+20 | pwa-update-controller | (function(){
+21 | <none> | /* UNIVERSAL_LOCK_SCREEN_AUDIO_SUPPRESSION_PATCH */
+22 | sound-toggle-text-runtime-patch | (function(){
+23 | music-toggle-global-audio-gate-patch | (function(){
+24 | pause-menu-overlay-behaviour-patch | (function(){
+25 | god-drop-rate-reduction-patch | (function(){
+26 | auto-pause-on-blur-patch | (function(){
+27 | supabase-url-helper-patch | (function(){
+28 | leaderboard-submit-safe-fallback-patch | (function(){
+29 | return-to-menu-from-death-patch | (function(){
+30 | title-video-loop-restore-patch | (function(){
+31 | boot-splash-layout-wait-patch | (function(){
+32 | death-return-menu-patch | (function(){
+33 | return-menu-force-bind-patch | (function(){
+34 | death-return-menu-visible-handler | (function(){
+35 | undead-ui-state-manager | (function(){
+36 | enemy-recoil-gamefeel-patch | window.__undeadEnemyRecoilPatch = true;
+37 | spell-audio-manager-patch | (function(){
+38 | fireball-audio-direct-fix | (function(){
+39 | charged-spell-system-v2-fixed-longpress | (function(){
+40 | pause-sound-options-patch | (function(){
+41 | sword-uploaded-audio-final-patch | (function(){
+42 | integrated-spin-sword-system-v2-fixed-longpress | (function(){
+43 | level-up-audio-patch | (function(){
+44 | clean-game-music-state-patch | (function(){
+45 | pause-overlay-resume-music-direct-fix | (function(){
+46 | pause-does-not-stop-music-final-guard-v2 | (function(){
+47 | lock-screen-audio-hard-stop-final-v1 | (function(){
