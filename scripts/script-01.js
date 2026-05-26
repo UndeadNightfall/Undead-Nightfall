@@ -140,7 +140,8 @@ const bossTypes=[
  {key:"wraith",name:"Wraith Lord",hp:720,atk:28,spd:70,r:42,body:"#1a0a2e",head:"#d4c8f0",aura:"#8855ff"},
  {key:"necromancer",name:"Necromancer",hp:900,atk:26,spd:54,r:45,body:"#1c1430",head:"#ede6ff",aura:"#85ff9c"},
  {key:"plague",name:"Plague Harbinger",hp:1100,atk:18,spd:38,r:54,body:"#1a3a0a",head:"#253d18",aura:"#7ecf3a"},
- {key:"twins",name:"Ashenveil Twins",hp:500,atk:22,spd:62,r:38,body:"#0a1a2e",head:"#c8e8ff",aura:"#a0e8ff",twin:true}
+ {key:"twins",name:"Ashenveil Twins",hp:500,atk:22,spd:62,r:38,body:"#0a1a2e",head:"#c8e8ff",aura:"#a0e8ff",twin:true},
+ {key:"dragon",name:"Bone Dragon",hp:1400,atk:40,spd:30,r:72,body:"#c8bfa0",head:"#ede4c8",aura:"#e8c84a"}
 ];
 function fmt(s){return String((s/60)|0).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
 function unlockedEnemyNames(){
@@ -820,6 +821,35 @@ function update(dt){sanitizeSwordState();if(!game||game.paused||game.over)return
         if(h.inv<=0){if(h.boosts.god>0){h.inv=.12;burst(h.x,h.y,"#f4e66a",10);tone(860,.05,"triangle",.03);}else{h.inv=e.enraged?.18:.25;burst(h.x,h.y,e.aura||"#ff5555",14);tone(62,.12,"sawtooth",.07);applyHeroDamage(e.atk,e.type||"boss");}}
       }
       continue;
+   } else if(e.bossKey==="dragon"){
+    if(e.chargeCd===undefined)e.chargeCd=6;
+    if(e.breathCd===undefined)e.breathCd=0;
+    const dragSpd=e.spd*(e.slow>0?.55:1);
+    e.breathCd=Math.max(0,e.breathCd-dt);
+    if(e.chargeTime>0){
+      e.chargeTime=Math.max(0,e.chargeTime-dt);
+      e.x+=e.chargeDx*dragSpd*3*dt;
+      e.y+=e.chargeDy*dragSpd*3*dt;
+    } else {
+      e.x+=dx/d*dragSpd*dt;e.y+=dy/d*dragSpd*dt;
+      e.chargeCd=Math.max(0,e.chargeCd-dt);
+      if(e.chargeCd<=0){
+        e.chargeCd=8;e.chargeTime=1.5;
+        e.chargeDx=dx/d;e.chargeDy=dy/d;
+        burst(e.x,e.y,e.aura||"#e8c84a",20);tone(95,.18,"sawtooth",.07);
+      }
+    }
+    if(e.breathCd<=0&&d<640){
+      e.breathCd=3;
+      const baseAng=Math.atan2(dy,dx);
+      for(let bi=0;bi<5;bi++){const spread=(bi-2)*.22,ang=baseAng+spread;game.arrows.push({x:e.x,y:e.y,vx:Math.cos(ang)*380,vy:Math.sin(ang)*380,life:2.0,damage:e.atk,color:"#e8c84a",boss:true});}
+      tone(110,.14,"sawtooth",.06);
+    }
+    if(d<e.r+h.r+8&&e.cd<=0){
+      e.cd=1.1;
+      if(h.inv<=0){if(h.boosts.god>0){h.inv=.12;burst(h.x,h.y,"#f4e66a",10);tone(860,.05,"triangle",.03);}else{h.inv=.25;burst(h.x,h.y,e.aura||"#e8c84a",14);tone(62,.12,"sawtooth",.07);applyHeroDamage(e.atk,e.type||"boss");}}
+    }
+    continue;
    }
    if(e.specialCd!==undefined)e.specialCd=Math.max(0,e.specialCd-dt);
    const spd=e.spd*(e.slow>0?.55:1);
@@ -1177,6 +1207,36 @@ function drawAshTwin(e,h,hit){
  ctx.fillStyle=hit?"#fff":enraged?"#ff4400":"#552200";
  ctx.beginPath();ctx.moveTo(-14,-46);ctx.lineTo(-8,-56);ctx.lineTo(-3,-48);ctx.lineTo(0,-60);ctx.lineTo(3,-48);ctx.lineTo(8,-56);ctx.lineTo(14,-46);ctx.lineTo(12,-44);ctx.lineTo(-12,-44);ctx.closePath();ctx.fill();
 }
+function drawBoneDragon(e,h,hit){
+ const charging=e.chargeTime>0,aim=Math.atan2(h.y-e.y,h.x-e.x);
+ const pulse=.5+.5*Math.sin(game.t*(charging?14:6));
+ ctx.save();ctx.rotate(aim);
+ // aura
+ ctx.globalAlpha=(charging?.45:.22)+.1*pulse;ctx.fillStyle=e.aura||"#e8c84a";
+ ctx.beginPath();ctx.arc(0,0,e.r+22,0,6.283);ctx.fill();ctx.globalAlpha=1;
+ // wings
+ ctx.fillStyle=hit?"#fff":"#a89870";
+ ctx.beginPath();ctx.moveTo(-10,-10);ctx.quadraticCurveTo(-60,-55,-90,-30);ctx.quadraticCurveTo(-65,5,-10,10);ctx.closePath();ctx.fill();
+ ctx.beginPath();ctx.moveTo(-10,10);ctx.quadraticCurveTo(-60,55,-90,30);ctx.quadraticCurveTo(-65,-5,-10,-10);ctx.closePath();ctx.fill();
+ // body
+ ctx.fillStyle=hit?"#fff":e.body||"#c8bfa0";
+ ctx.beginPath();ctx.ellipse(0,0,e.r,e.r*.72,0,0,6.283);ctx.fill();
+ ctx.strokeStyle=charging?"#e8c84a":"#a89060";ctx.lineWidth=charging?4:2;ctx.stroke();
+ // spine ridges
+ ctx.fillStyle=hit?"#fff":"#ede4c8";
+ for(let ri=0;ri<5;ri++){const rx=-e.r*.6+ri*(e.r*.28);ctx.beginPath();ctx.moveTo(rx,-e.r*.72);ctx.lineTo(rx+6,-e.r*.72-10);ctx.lineTo(rx+12,-e.r*.72);ctx.fill();}
+ // neck + skull head
+ ctx.fillStyle=hit?"#fff":e.head||"#ede4c8";
+ ctx.beginPath();ctx.ellipse(e.r+16,0,22,14,0,0,6.283);ctx.fill();
+ ctx.strokeStyle=charging?"#e8c84a":"#b8a878";ctx.lineWidth=2;ctx.stroke();
+ // jaw
+ ctx.fillStyle=hit?"#fff":"#c8bfa0";
+ ctx.beginPath();ctx.moveTo(e.r+6,6);ctx.lineTo(e.r+38,10);ctx.lineTo(e.r+6,14);ctx.closePath();ctx.fill();
+ // eye
+ ctx.fillStyle=charging?"#ff4400":"#e8c84a";
+ ctx.beginPath();ctx.arc(e.r+20,-4,4,0,6.283);ctx.fill();
+ ctx.restore();
+}
 function drawPlagueHarbinger(e,h,hit){
  const pulse=.5+.5*Math.sin(game.t*4),aim=Math.atan2(h.y-e.y,h.x-e.x);
  ctx.globalAlpha=.18+.1*pulse;ctx.fillStyle="#4ecf22";ctx.beginPath();ctx.arc(0,0,e.r+26,0,6.283);ctx.fill();ctx.globalAlpha=1;
@@ -1224,6 +1284,7 @@ function drawEnemy(e,h){
   else if(e.bossKey==="plague")drawPlagueHarbinger(e,h,hit);
   else if(e.bossKey==="twins"&&e.twinRole==="frost")drawFrostTwin(e,h,hit);
   else if(e.bossKey==="twins"&&e.twinRole==="ash")drawAshTwin(e,h,hit);
+  else if(e.bossKey==="dragon")drawBoneDragon(e,h,hit);
   else drawCorruptedWarlord(e,h,hit);
   ctx.restore();
   ctx.fillStyle="#240606";ctx.fillRect(e.x-e.r,e.y-e.r-26,e.r*2,5);
